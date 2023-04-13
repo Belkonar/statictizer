@@ -31,8 +31,8 @@ public class ContentLogic
             // TODO: Pull this from site config
             key = config.DefaultFile;
         }
-
-        // http.Response.Headers.ContentType = "text/plain";//MimeTypes.GetMimeType(key);
+        
+        http.Response.Headers.CacheControl = "no-store";
         
         return Results.File(await _storage.GetFile(host, key), MimeTypes.GetMimeType(key));
     }
