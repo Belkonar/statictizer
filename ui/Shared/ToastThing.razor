@@ -1,0 +1,37 @@
+@inject ToastService ToastService
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99;">
+    @foreach (var toast in Toasts)
+    { 
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header @toast.Classes">
+                <strong class="me-auto">@toast.Kind</strong>
+                <button onclick="@(() => RemoveToast(toast.Id))" type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @toast.Message
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Toast> Toasts { get; set; } = new ();
+
+    protected override void OnInitialized()
+    {
+        ToastService.Update += LoadToasts;
+    }
+
+    public void LoadToasts()
+    {
+        Toasts = ToastService.GetToasts();
+        StateHasChanged();
+    }
+
+    public void RemoveToast(Guid id)
+    {
+        ToastService.RemoveToast(id);
+    }
+
+}

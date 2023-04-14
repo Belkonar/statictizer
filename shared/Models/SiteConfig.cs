@@ -11,6 +11,8 @@ public class SiteConfig
 
     public string Description { get; set; } = "";
 
+    public string DefaultCache { get; set; } = "no-store";
+
     /// <summary>
     /// 
     /// </summary>

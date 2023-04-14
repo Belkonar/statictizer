@@ -23,18 +23,31 @@ public class ContentLogic
 
         if (config == null)
         {
+            return Results.NotFound(new
+            {
+                Error = $"Site `{host}` not configured"
+            });
             throw new FileNotFoundException($"Site {host} not configured");
         }
         
         if (!await _storage.FileExists(host, key))
         {
-            // TODO: Pull this from site config
             key = config.DefaultFile;
         }
         
-        http.Response.Headers.CacheControl = "no-store";
-        
-        return Results.File(await _storage.GetFile(host, key), MimeTypes.GetMimeType(key));
+        http.Response.Headers.CacheControl = config.DefaultCache;
+
+        try
+        {
+            return Results.File(await _storage.GetFile(host, key), MimeTypes.GetMimeType(key));
+        }
+        catch (FileNotFoundException)
+        {
+            return Results.NotFound(new
+            {
+                Error = $"Key `{key}` not found on host `{host}`"
+            });
+        }
     }
 
     public async Task<SiteConfig?> GetConfig(string host)
@@ -44,6 +57,6 @@ public class ContentLogic
         var filter = Builders<SiteConfig>.Filter
             .Eq(x => x.Host, host);
 
-        return await collection.Find(filter).FirstAsync();
+        return await collection.Find(filter).FirstOrDefaultAsync();
     }
 }

@@ -2,6 +2,7 @@
 @using shared.Models
 
 @inject HttpClient Http
+@inject IConfiguration Config
 
 <h3>Sites</h3>
 
@@ -11,6 +12,7 @@
         <THead>
         <th>Host</th>
         <th>Description</th>
+        <th>Link</th>
         <th>Has Cache Control</th>
         </THead>
         <TBody>
@@ -21,6 +23,7 @@
                     <a href="/site/@site.Host">@site.Host</a>
                 </td>
                 <td>@site.Description</td>
+                <td><a href="@GetLink(site.Host)">@GetLink(site.Host)</a></td>
                 <td>
                     @site.Rules.Any()
                 </td>
@@ -33,8 +36,17 @@
 @code {
     private List<SiteConfig> SiteList { get; set; } = new();
 
+    private string _linkFormat = "";
+
     protected override async Task OnInitializedAsync()
     {
+        _linkFormat = Config.GetValue<string>("linkOverride") ?? "https://{host}";
+        
         SiteList = await Http.GetFromJsonAsync<List<SiteConfig>>("/Site") ?? new List<SiteConfig>();
+    }
+
+    private string GetLink(string host)
+    {
+        return _linkFormat.Replace("{host}", host);
     }
 }

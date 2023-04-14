@@ -3,6 +3,8 @@
 @using shared.Models
 
 @inject HttpClient Http
+@inject NavigationManager Nav
+@inject ToastService Toaster
 
 <h3>Manage Site</h3>
 
@@ -19,6 +21,10 @@
         <label for="default-file">Default File</label>
         <input id="default-file" class="form-control" @bind="Config.DefaultFile"/>
     </div>
+    <div class="mb-3">
+            <label for="default-file">Default Cache</label>
+            <input id="default-cache" class="form-control" @bind="Config.DefaultCache"/>
+        </div>
     <div @onclick="Save" class="btn btn-primary">Save</div>
 </Card>
 
@@ -42,6 +48,21 @@
     private async Task Save()
     {
         using var response = await Http.PutAsJsonAsync("/site", Config);
+
+        try
+        {
+            response.EnsureSuccessStatusCode();
+            Toaster.AddSuccess("Save Complete");
+        }
+        catch (Exception e)
+        {
+            Toaster.AddError(e);
+        }
+        
+        if (!IsEdit)
+        {
+            Nav.NavigateTo($"/site/{Config.Host}");
+        }
     }
 
 }
