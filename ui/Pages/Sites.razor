@@ -1,5 +1,6 @@
 @page "/sites"
 @using shared.Models
+@using System.Net
 
 @inject HttpClient Http
 @inject IConfiguration Config
@@ -20,7 +21,7 @@
         {
             <tr>
                 <td>
-                    <a href="/site/@site.Host">@site.Host</a>
+                    <a href="/site/@site.Host/">@site.Host</a>
                 </td>
                 <td>@site.Description</td>
                 <td><a href="@GetLink(site.Host)">@GetLink(site.Host)</a></td>

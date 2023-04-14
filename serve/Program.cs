@@ -33,11 +33,16 @@ async Task<IResult> Run(HttpContext http, string slug)
     var logic = scope.ServiceProvider.GetRequiredService<ContentLogic>();
     
     return await logic.GetContent(http, slug);
-    //var file = File.OpenRead("Program.cs");
-    return Results.Text(MimeTypes.GetMimeType(slug));
 }
 
-// Need to specify or it borks
+// This is needed for LBs to work properly
+// It's the only file you can't have mapped to a static file
+app.MapGet("/system-health", () => new
+{
+    status = "ok"
+});
+
+// Need to specify `handler` or it borks
 app.MapGet("/", handler: async (HttpContext context) => await Run(context, ""));
 app.MapGet("/{*slug}", async (HttpContext context, [FromRoute] string slug) => await Run(context, slug));
 
