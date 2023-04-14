@@ -1,0 +1,20 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            @THead
+        </tr>
+    </thead>
+    <tbody>
+        @TBody
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    // ReSharper disable once InconsistentNaming
+    public RenderFragment THead { get; set; }
+    
+    [Parameter]
+    // ReSharper disable once InconsistentNaming
+    public RenderFragment TBody { get; set; }
+}

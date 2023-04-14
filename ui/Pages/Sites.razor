@@ -1,0 +1,40 @@
+@page "/sites"
+@using shared.Models
+
+@inject HttpClient Http
+
+<h3>Sites</h3>
+
+<Card>
+    <a class="btn btn-primary" href="/site-create">Create</a>
+    <Table>
+        <THead>
+        <th>Host</th>
+        <th>Description</th>
+        <th>Has Cache Control</th>
+        </THead>
+        <TBody>
+        @foreach (var site in SiteList)
+        {
+            <tr>
+                <td>
+                    <a href="/site/@site.Host">@site.Host</a>
+                </td>
+                <td>@site.Description</td>
+                <td>
+                    @site.Rules.Any()
+                </td>
+            </tr>
+        }
+        </TBody>
+    </Table>
+</Card>
+
+@code {
+    private List<SiteConfig> SiteList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SiteList = await Http.GetFromJsonAsync<List<SiteConfig>>("/Site") ?? new List<SiteConfig>();
+    }
+}
