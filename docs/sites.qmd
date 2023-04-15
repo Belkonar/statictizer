@@ -1,0 +1,20 @@
+---
+title: Sites
+---
+
+## Storage Type
+
+There are currently two storage types.
+
+* MongoDB
+* S3
+
+MongoDB allows for faster feedback due to the really efficient batching in the upload. It does however
+have a limit of 16k for document size. S3 is batched via semaphore but it's no where near as efficient.
+S3 however is cheaper if you use Atlas.
+
+As a result, if you are using the site for a project (like I do with Archi and Quarto): Use MongoDB.
+If you are are using it for a product where it's primarily managed via pipeline: use S3.
+
+If you do happen to use S3, the keys are in the form of `{host}/{key}` so you can choose to sync them
+another way and still use statictizer to serve them up.

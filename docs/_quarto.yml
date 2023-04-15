@@ -1,0 +1,27 @@
+project:
+  type: website
+
+website:
+  title: "docs"
+  sidebar:
+    style: "floating"
+    search: true
+    contents:
+    - section: "Basics"
+      contents: 
+      - href: index.qmd
+        text: Home
+      - about.qmd
+    - section: "Configuration"
+      contents:
+      - sites.qmd
+      - cache-control.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

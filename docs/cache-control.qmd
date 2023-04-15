@@ -1,0 +1,16 @@
+---
+title: Cache-Control
+---
+
+When using any static website host it's important to to ensure you have control over when
+files are cached on an edge and for how long. Here are some basics.
+
+By default, all sites use a default setting of `no-store`. This ensures that it won't
+ever even be stored in a cache and will always end up back at the origin for each request.
+
+::: {.callout-caution}
+## Caution CloudFront and `no-store`
+
+If you have a `min-age` of greater than 0 in your distribution settings. 
+CloudFront will ignore any directives telling it not to cache items.
+:::
