@@ -5,13 +5,14 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using serve;
 using serve.Logic;
+using service_deps.Services;
 using shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<ContentLogic>();
 
-builder.Services.AddSingleton<ILocationStorage, MongoLocationStorage>();
+builder.Services.AddSingleton<ILocationStorage, S3LocationStorage>();
 
 #pragma warning disable 618
 //BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;

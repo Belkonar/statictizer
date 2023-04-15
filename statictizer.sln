@@ -7,11 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "serve", "serve\serve.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "api\api.csproj", "{00E5B640-F928-437A-86B0-4D3E33FDA246}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shared", "shared\shared.csproj", "{DD34FCC8-20CE-42EA-A94A-9DAC8AD32111}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "models", "models\models.csproj", "{DD34FCC8-20CE-42EA-A94A-9DAC8AD32111}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cli", "cli\cli.csproj", "{69DCB703-B4C0-46DF-B38E-6B66C1428749}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ui", "ui\ui.csproj", "{609F4046-F9C3-4E5E-954E-30B7BFE78470}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shared", "shared\shared.csproj", "{F9F411FB-3DD6-4219-A2E9-001543EF90A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,5 +44,9 @@ Global
 		{609F4046-F9C3-4E5E-954E-30B7BFE78470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{609F4046-F9C3-4E5E-954E-30B7BFE78470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{609F4046-F9C3-4E5E-954E-30B7BFE78470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9F411FB-3DD6-4219-A2E9-001543EF90A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9F411FB-3DD6-4219-A2E9-001543EF90A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9F411FB-3DD6-4219-A2E9-001543EF90A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9F411FB-3DD6-4219-A2E9-001543EF90A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
