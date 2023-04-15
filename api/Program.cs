@@ -22,14 +22,10 @@ builder.Services.AddSingleton<IMongoDatabase>(_ => new MongoClient(
 
 var storageType = builder.Configuration.GetValue<string>("storageType") ?? "mongo";
 
-if (storageType == "mongo")
-{
-    builder.Services.AddSingleton<ILocationStorage, MongoLocationStorage>();
-}
-else
-{
-    builder.Services.AddSingleton<ILocationStorage, S3LocationStorage>();
-}
+builder.Services.AddSingleton<MongoLocationStorage>();
+builder.Services.AddSingleton<S3LocationStorage>();
+
+builder.Services.AddSingleton<StorageFactory>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

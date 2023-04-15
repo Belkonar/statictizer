@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using service_deps.Services;
 using shared.Models;
 using shared.Services;
 
@@ -6,13 +7,13 @@ namespace serve.Logic;
 
 public class ContentLogic
 {
-    private readonly ILocationStorage _storage;
     private readonly IMongoDatabase _database;
+    private readonly StorageFactory _storageFactory;
 
-    public ContentLogic(ILocationStorage storage, IMongoDatabase database)
+    public ContentLogic(IMongoDatabase database, StorageFactory storageFactory)
     {
-        _storage = storage;
         _database = database;
+        _storageFactory = storageFactory;
     }
     
     public async Task<IResult> GetContent(HttpContext http, string key)
@@ -29,8 +30,10 @@ public class ContentLogic
             });
             throw new FileNotFoundException($"Site {host} not configured");
         }
+
+        var storage = _storageFactory.GetStorage(config.StorageType);
         
-        if (!await _storage.FileExists(host, key))
+        if (!await storage.FileExists(host, key))
         {
             key = config.DefaultFile;
         }
@@ -39,7 +42,7 @@ public class ContentLogic
 
         try
         {
-            return Results.File(await _storage.GetFile(host, key), MimeTypes.GetMimeType(key));
+            return Results.File(await storage.GetFile(host, key), MimeTypes.GetMimeType(key));
         }
         catch (FileNotFoundException)
         {

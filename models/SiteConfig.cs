@@ -13,6 +13,8 @@ public class SiteConfig
 
     public string DefaultCache { get; set; } = "no-store";
 
+    public string StorageType { get; set; } = "mongo";
+
     /// <summary>
     /// 
     /// </summary>

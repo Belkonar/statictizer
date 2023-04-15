@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using service_deps.Services;
 using shared.Models;
 using shared.Services;
 
@@ -11,12 +12,12 @@ namespace api.Controllers;
 public class SiteController : ControllerBase
 {
     private readonly IMongoDatabase _database;
-    private readonly ILocationStorage _storage;
+    private readonly StorageFactory _storageFactory;
 
-    public SiteController(IMongoDatabase database, ILocationStorage storage)
+    public SiteController(IMongoDatabase database, StorageFactory storageFactory)
     {
         _database = database;
-        _storage = storage;
+        _storageFactory = storageFactory;
     }
     
     /// <summary>
@@ -46,7 +47,12 @@ public class SiteController : ControllerBase
     [DisableRequestSizeLimit]
     public async Task<IActionResult> UploadSite([FromRoute] string host)
     {
-        await _storage.UpdateSite(host, Request.Body);
+        var site = await GetSites(host);
+        
+        var storage = _storageFactory.GetStorage(site.StorageType);
+        
+        await storage.UpdateSite(host, Request.Body);
+        
         return Ok();
     }
 

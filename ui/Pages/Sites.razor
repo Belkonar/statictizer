@@ -14,7 +14,7 @@
         <th>Host</th>
         <th>Description</th>
         <th>Link</th>
-        <th>Has Cache Control</th>
+        <th>Storage Type</th>
         </THead>
         <TBody>
         @foreach (var site in SiteList)
@@ -26,7 +26,7 @@
                 <td>@site.Description</td>
                 <td><a href="@GetLink(site.Host)">@GetLink(site.Host)</a></td>
                 <td>
-                    @site.Rules.Any()
+                    @site.StorageType
                 </td>
             </tr>
         }

@@ -104,7 +104,7 @@ public class S3LocationStorage : ILocationStorage
             }).ToList()
         });
 
-        using var semaphore = new SemaphoreSlim(20);
+        using var semaphore = new SemaphoreSlim(10);
 
         var tasks = new List<Task>();
 
