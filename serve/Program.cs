@@ -12,7 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<ContentLogic>();
 
-builder.Services.AddSingleton<ILocationStorage, S3LocationStorage>();
+var storageType = builder.Configuration.GetValue<string>("storageType") ?? "mongo";
+
+if (storageType == "mongo")
+{
+    builder.Services.AddSingleton<ILocationStorage, MongoLocationStorage>();
+}
+else
+{
+    builder.Services.AddSingleton<ILocationStorage, S3LocationStorage>();
+}
 
 #pragma warning disable 618
 //BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
