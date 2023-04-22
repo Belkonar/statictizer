@@ -1,5 +1,4 @@
 using System.CommandLine;
-using Amazon.Runtime.Internal;
 using cli.Handlers;
 
 IHost host = Host.CreateDefaultBuilder(args)

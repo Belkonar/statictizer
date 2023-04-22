@@ -1,12 +1,15 @@
 using System.CommandLine;
 using System.IO.Compression;
+using System.Net.Http.Json;
+using helpers;
 using shared;
+using shared.Models;
 
 namespace cli.Handlers;
 
 public class UploadHandler
 {
-    public async Task Upload(FileInfo config)
+    private async Task Upload(FileInfo config)
     {
         if (!config.Exists)
         {
@@ -14,6 +17,11 @@ public class UploadHandler
         }
 
         var configData = await JsonHelper.GetFile<ConfigFile>(config.FullName);
+
+        if (configData.PreUpload is { Count: > 0 })
+        {
+            ExecutePreUpload(configData.PreUpload);
+        }
 
         var actualTarget = Path.GetFullPath(configData.Target, Path.GetDirectoryName(config.FullName)!);
 
@@ -27,15 +35,39 @@ public class UploadHandler
         var targetFile = temp.GetFile();
         
         ZipFile.CreateFromDirectory(actualTarget, targetFile);
-
-        await using var archive = File.OpenRead(targetFile);
         using var client = new HttpClient();
 
+        var signedResponse = await client.GetFromJsonAsync<PreSignResponse>($"{configData.ApiHost}/site/pre-sign/{configData.SiteHost}");
+        
+        await using var archive = File.OpenRead(targetFile);
         using var content = new StreamContent(archive);
 
-        var response = await client.PutAsync($"{configData.ApiHost}/site/{configData.SiteHost}", content);
-
+        var response = await client.PutAsync(signedResponse.SignedUrl, content);
+        
         response.EnsureSuccessStatusCode();
+
+        var uploadRequest = new UploadRequest()
+        {
+            Host = configData.SiteHost,
+        };
+
+        using var uploadResponse = await client.PutAsJsonAsync($"{configData.ApiHost}/site/upload", uploadRequest);
+        
+        Console.WriteLine(await uploadResponse.Content.ReadAsStringAsync());
+
+        uploadResponse.EnsureSuccessStatusCode();
+    }
+
+    private void ExecutePreUpload(List<string> preUpload)
+    {
+        var config = new ExecutorConfig()
+        {
+            Command = preUpload.First(),
+            Arguments = preUpload.Skip(1).ToList()
+        };
+
+        var response = Executor.Execute(config);
+        Console.WriteLine(response.Shared);
     }
     
     public void Setup(RootCommand rootCommand)

@@ -22,14 +22,6 @@
         <input id="default-file" class="form-control" @bind="Config.DefaultFile"/>
     </div>
     <div class="mb-3">
-        <label for="storage-type">Storage Type</label>
-        <select id="storage-type" class="form-control" @bind="Config.StorageType" disabled="@IsEdit" readonly="@IsEdit">
-            <option value="mongo">MongoDB</option>
-            <option value="s3">S3</option>
-        </select>
-        <span class="small text-muted">The storage type cannot be changed without an admin. MongoDB has faster uploads (due to batching) but is limited to 16k file sizes.</span>
-    </div>
-    <div class="mb-3">
         <label for="default-file">Default Cache</label>
         <input id="default-cache" class="form-control" @bind="Config.DefaultCache"/>
     </div>

@@ -12,10 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<ContentLogic>();
 
-builder.Services.AddSingleton<MongoLocationStorage>();
 builder.Services.AddSingleton<S3LocationStorage>();
-
-builder.Services.AddSingleton<StorageFactory>();
 
 #pragma warning disable 618
 //BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;

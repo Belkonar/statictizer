@@ -2,6 +2,7 @@ using System.IO.Compression;
 using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using helpers;
 using Microsoft.Extensions.Configuration;
 using shared;
 using shared.Services;
@@ -60,29 +61,28 @@ public class S3LocationStorage : ILocationStorage
     /// </summary>
     /// <param name="host"></param>
     /// <param name="package"></param>
-    public async Task UpdateSite(string host, Stream package)
+    public async Task UpdateSite(string host)
     {
         var prefix = $"{host}/";
+        var packageKey = $"uploads/{host}";
         
         using var folder = new TempFolder();
         
         var destination = folder.CreateRandomFolder();
-        
-        await using (package)
-        {
-            var archive = folder.GetFile();
-            
-            await using var writer = File.OpenWrite(archive);
-            await package.CopyToAsync(writer);
-            writer.Close();
 
-            ZipFile.ExtractToDirectory(archive, destination);
-        }
+        using var client = new AmazonS3Client(RegionEndpoint.USEast2);
+        
+        var archive = folder.GetFile();
+
+        var response = await client.GetObjectAsync(_bucketName, packageKey);
+        await response.WriteResponseStreamToFileAsync(archive, false, CancellationToken.None);
+
+        await client.DeleteObjectAsync(_bucketName, packageKey);
+        
+        ZipFile.ExtractToDirectory(archive, destination);
         
         var files = Directory.GetFiles(destination, "*", SearchOption.AllDirectories)
             .ToList();
-        
-        using var client = new AmazonS3Client(RegionEndpoint.USEast2);
 
         var objects = await client.ListObjectsV2Async(new ListObjectsV2Request()
         {
@@ -95,14 +95,22 @@ public class S3LocationStorage : ILocationStorage
 
         var purge = keys.Except(newKeys).ToList();
 
-        await client.DeleteObjectsAsync(new DeleteObjectsRequest()
+        foreach (var toPurge in purge)
         {
-            BucketName = _bucketName,
-            Objects = purge.Select(x => new KeyVersion()
+            Console.WriteLine(toPurge);
+        }
+
+        if (purge.Count > 0)
+        {
+            await client.DeleteObjectsAsync(new DeleteObjectsRequest()
             {
-                Key = x
-            }).ToList()
-        });
+                BucketName = _bucketName,
+                Objects = purge.Select(x => new KeyVersion()
+                {
+                    Key = x
+                }).ToList()
+            });
+        }
 
         using var semaphore = new SemaphoreSlim(10);
 

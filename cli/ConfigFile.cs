@@ -13,4 +13,6 @@ public class ConfigFile
     /// This will get yoinked later
     /// </summary>
     public string SiteHost { get; set; } = "";
+    
+    public List<string>? PreUpload { get; set; }
 }

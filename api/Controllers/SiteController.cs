@@ -1,3 +1,6 @@
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -12,12 +15,20 @@ namespace api.Controllers;
 public class SiteController : ControllerBase
 {
     private readonly IMongoDatabase _database;
-    private readonly StorageFactory _storageFactory;
+    private readonly S3LocationStorage _storage;
+    private readonly string _bucketName;
 
-    public SiteController(IMongoDatabase database, StorageFactory storageFactory)
+    public SiteController(IMongoDatabase database, IConfiguration config, S3LocationStorage storage)
     {
         _database = database;
-        _storageFactory = storageFactory;
+        _storage = storage;
+
+        _bucketName = config.GetValue<string>("s3bucket") ?? "";
+
+        if (_bucketName == "")
+        {
+            throw new Exception("`s3bucket` not configured");
+        }
     }
     
     /// <summary>
@@ -42,18 +53,38 @@ public class SiteController : ControllerBase
 
         return config;
     }
-
-    [HttpPut("{host}")]
-    [DisableRequestSizeLimit]
-    public async Task<IActionResult> UploadSite([FromRoute] string host)
+    
+    // TODO: Make a config to turn this call into a no-op
+    // The purpose of doing that is async uploads handled via some other system.
+    [HttpPut("upload")]
+    public async Task<SimpleValue> UploadSiteFromS3([FromBody] UploadRequest request)
     {
-        var site = await GetSites(host);
+        await _storage.UpdateSite(request.Host);
         
-        var storage = _storageFactory.GetStorage(site.StorageType);
-        
-        await storage.UpdateSite(host, Request.Body);
-        
-        return Ok();
+        return new SimpleValue()
+        {
+            Value = "Upload Complete"
+        };
+    }
+
+    [HttpGet("pre-sign/{host}")]
+    public PreSignResponse GetPreSign([FromRoute] string host)
+    {
+        using var client = new AmazonS3Client(RegionEndpoint.USEast2);
+
+        var key = $"uploads/{host}";
+
+        return new PreSignResponse()
+        {
+            Key = key,
+            SignedUrl = client.GetPreSignedURL(new GetPreSignedUrlRequest()
+            {
+                BucketName = _bucketName,
+                Key = key,
+                Verb = HttpVerb.PUT,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            })
+        };
     }
 
     [HttpGet]
